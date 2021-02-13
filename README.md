@@ -12,28 +12,30 @@ Given the internet is light on great examples of the sportsreference API, I've i
 
 You can also find the full code at https://github.com/jvonfeldt/CovidBaseball.
 
+## Edit: With the 2020 season wrapped up, I think we can conclusively say the home team did *better* in 2020! This provides some pretty good evidence homefield advantage isn't the "12th man" but a comfortable routine for the players. The gap in how comfortable the home team is probably grew in 2020, explaining the discrepancy here.
+
 
 ```python
 #Plot figures
+fig = plt.figure(figsize=(12,4))
+ax1 = fig.add_subplot(1,2,1)
+ax2 = fig.add_subplot(1,2,2)
 
-a = dfh_n.plot(title = 'MLB Home Field Advantage - 2015-2019', xlabel = 'Days into Season', ylabel = 'Home Win %')
-c = dfva.plot(title = 'MLB Home Field Advantage - 2020 vs Last 5 Years', xlabel = 'Days into Season', ylabel = 'Home Win %')
-c.legend(['Historical', '2020'])
+dfh_n.plot(title = 'MLB Home Field Advantage - 2015-2019', xlabel = 'Days into Season', ylabel = 'Home Win %',
+           ax=ax2,linewidth=3)
+dfva.plot(title = 'MLB Home Field Advantage - 2020 vs Last 5 Years', xlabel = 'Days into Season', ylabel = 'Home Win %',
+          ax=ax1,linewidth=3)
+
+ax1.legend(['Historical','2020'],loc='lower right')
+
+for ax in [ax1,ax2]:
+    for s in ax.spines:
+        ax.spines[s].set_visible(False)
+    ax.tick_params(left=False,bottom=False)
 ```
 
 
-
-
-    <matplotlib.legend.Legend at 0x121e98b0>
-
-
-
-
-![png](output_1_1.png)
-
-
-
-![png](output_1_2.png)
+![png](output_1_0.png)
 
 
 # Commentary
@@ -51,12 +53,12 @@ from sportsreference.mlb.teams import Teams
 from sportsreference.mlb.boxscore import Boxscores
 
 
-#Basic imports - I dont' have any additional color
+#Basic imports 
 import pandas as pd
 from datetime import datetime, timedelta
 import numpy as np
 import pickle
-import matplotlib
+import matplotlib.pyplot as plt
 ```
 
 
@@ -80,7 +82,7 @@ def season(mydates):
         for counter, game in enumerate(allscores):
 
 
-            #For each game, determien who the winner is
+            #For each game, determine who the winner is
             boxscore = allscores[counter]
             ar = boxscore['away_score']
             hr = boxscore['home_score']
@@ -167,15 +169,24 @@ for i in years:
 
 
 ```python
+## Pull data for the 2020 season. 
+## Retired. This was used during the season.
+# thisyear = {}
+
+# o = datetime(2020,7,23)
+# c = datetime(2020,12,31)
+
+# mydates = pd.date_range(o, c)
+# thisyear =  season(mydates)
+```
+
+
+```python
 ## Pull data for the 2020 season
-
-thisyear = {}
-
-o = datetime(2020,7,23)
-c = datetime.today() - timedelta(days=1)
-
-mydates = pd.date_range(o, c)
-thisyear =  season(mydates)
+    
+o,c = season_length('2020')
+mydates = pd.date_range(o,c)
+thisyear = season(mydates)
 ```
 
 
@@ -252,4 +263,9 @@ b = df2020.reset_index()
 dfv = pd.merge(a, b, on = 'Sch_len', how = 'inner')
 dfv = dfv.set_index('Sch_len')
 dfva = dfv.iloc[10:]
+```
+
+
+```python
+
 ```
